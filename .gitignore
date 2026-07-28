@@ -1,13 +1,44 @@
+# Environment variables and secrets
 .env
+.env.*
+!.env.example
+
+# Python
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
+venv/
+*.egg-info/
+
+# Frontend
 node_modules/
 dist/
+
+# IDE and local database sessions
 .idea/
 .vscode/
+*.session.sql
+
+# Runtime and generated files
 storage/
 uploads/
 generated-reports/
+logs/
+*.log
+models/
+*.pkl
+*.joblib
 
+# Enterprise data: never commit raw or processed customer data
+data/raw/
+data/processed/
+data/private/
+
+# Local database connection/bootstrap files containing real credentials
+database/fwwb/001_create_schema_users.sql
+backend/data/metadata/sources.json
+
+# OS files
+.DS_Store
+Thumbs.db
