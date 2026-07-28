@@ -1,0 +1,50 @@
+[
+  {
+    "id": "b3d6e749-66ad-48ef-ad86-8a553d983e00",
+    "sql": "DELETE FROM manufacturing.fact_inventory",
+    "normalized_sql": "",
+    "status": "rejected",
+    "columns": [],
+    "rows": [],
+    "row_count": 0,
+    "duration_ms": 0.793,
+    "error": "仅允许 SELECT 查询; 检测到写入或管理语句",
+    "created_at": "2026-07-25T19:32:35.206144+00:00"
+  },
+  {
+    "id": "8172ef64-187d-488e-89a0-e3d75540b34e",
+    "sql": "DELETE FROM manufacturing.fact_inventory",
+    "normalized_sql": "",
+    "status": "rejected",
+    "columns": [],
+    "rows": [],
+    "row_count": 0,
+    "duration_ms": 0.929,
+    "error": "仅允许 SELECT 查询; 检测到写入或管理语句",
+    "created_at": "2026-07-25T19:35:09.583354+00:00"
+  },
+  {
+    "id": "a0b03f85-c315-4d56-b483-5426de37c9b1",
+    "sql": "DELETE FROM manufacturing.fact_inventory",
+    "normalized_sql": "",
+    "status": "rejected",
+    "columns": [],
+    "rows": [],
+    "row_count": 0,
+    "duration_ms": 0.563,
+    "error": "仅允许 SELECT 查询; 检测到写入或管理语句",
+    "created_at": "2026-07-26T15:29:01.686638+00:00"
+  },
+  {
+    "id": "9ae51a1a-1c19-4eaa-9643-55605308ac5e",
+    "sql": "DELETE FROM manufacturing.fact_inventory",
+    "normalized_sql": "",
+    "status": "rejected",
+    "columns": [],
+    "rows": [],
+    "row_count": 0,
+    "duration_ms": 0.954,
+    "error": "仅允许 SELECT 查询; 检测到写入或管理语句",
+    "created_at": "2026-07-26T18:09:06.968135+00:00"
+  }
+]

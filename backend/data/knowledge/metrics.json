@@ -1,0 +1,126 @@
+[
+  {
+    "id": 1,
+    "metric_code": "output_qty",
+    "metric_name": "产量",
+    "category": "生产",
+    "description": "指定统计范围内的实际生产数量。",
+    "formula_expression": "SUM(actual_qty)",
+    "unit": "件",
+    "time_field": "production_date",
+    "source_tables": [
+      "manufacturing.fact_process_output"
+    ],
+    "dimension_fields": [
+      "line_id",
+      "process_name"
+    ],
+    "synonyms": [
+      "生产数量",
+      "实际产量"
+    ],
+    "status": "active",
+    "version": 1,
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  },
+  {
+    "id": 2,
+    "metric_code": "process_yield_rate",
+    "metric_name": "工序良品率",
+    "category": "质量",
+    "description": "合格数量占实际生产数量的比例。",
+    "formula_expression": "SUM(qualified_qty) / NULLIF(SUM(actual_qty), 0)",
+    "unit": "%",
+    "time_field": "production_date",
+    "source_tables": [
+      "manufacturing.fact_process_output"
+    ],
+    "dimension_fields": [
+      "line_id",
+      "process_name"
+    ],
+    "synonyms": [
+      "良率",
+      "合格率"
+    ],
+    "status": "active",
+    "version": 1,
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  },
+  {
+    "id": 3,
+    "metric_code": "defect_rate",
+    "metric_name": "不良率",
+    "category": "质量",
+    "description": "不良数量占检验数量的比例。",
+    "formula_expression": "SUM(defect_qty) / NULLIF(SUM(inspected_qty), 0)",
+    "unit": "%",
+    "time_field": "inspection_date",
+    "source_tables": [
+      "manufacturing.fact_quality_inspection"
+    ],
+    "dimension_fields": [
+      "product_id",
+      "line_id"
+    ],
+    "synonyms": [
+      "缺陷率",
+      "次品率"
+    ],
+    "status": "active",
+    "version": 1,
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  },
+  {
+    "id": 4,
+    "metric_code": "downtime_minutes",
+    "metric_name": "停机时长",
+    "category": "设备",
+    "description": "设备在统计范围内的累计停机分钟数。",
+    "formula_expression": "SUM(downtime_minutes)",
+    "unit": "分钟",
+    "time_field": "started_at",
+    "source_tables": [
+      "manufacturing.fact_equipment_downtime"
+    ],
+    "dimension_fields": [
+      "equipment_id",
+      "reason"
+    ],
+    "synonyms": [
+      "故障时长",
+      "停机时间"
+    ],
+    "status": "active",
+    "version": 1,
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  },
+  {
+    "id": 5,
+    "metric_code": "inventory_gap",
+    "metric_name": "库存缺口",
+    "category": "库存",
+    "description": "安全库存高于当前库存的数量。",
+    "formula_expression": "GREATEST(safety_qty - current_qty, 0)",
+    "unit": "件",
+    "time_field": "record_date",
+    "source_tables": [
+      "manufacturing.fact_inventory"
+    ],
+    "dimension_fields": [
+      "product_id"
+    ],
+    "synonyms": [
+      "缺货量",
+      "补货缺口"
+    ],
+    "status": "active",
+    "version": 1,
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  }
+]

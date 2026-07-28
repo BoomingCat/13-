@@ -1,0 +1,902 @@
+[
+  {
+    "task_id": "419eaae8-f72d-4810-8213-bb30d61aa9aa",
+    "conversation_id": "5c888777-277f-4bea-b13b-63d740bd734d",
+    "question": "分析最近30天各产线的不良率",
+    "intent": "defect_rate_analysis",
+    "plan": {
+      "intent": "manufacturing_data_analysis",
+      "metric_codes": [
+        "defect_rate"
+      ],
+      "tables": [
+        "manufacturing.fact_quality_inspection",
+        "manufacturing.dim_production_line"
+      ],
+      "steps": [
+        "识别意图",
+        "匹配业务指标",
+        "定位数据表",
+        "生成安全查询",
+        "展示分析结果"
+      ]
+    },
+    "sql": "SELECT line.line_name AS category, ROUND(SUM(q.defect_qty) * 100.0 / NULLIF(SUM(q.inspected_qty), 0), 2) AS value FROM manufacturing.fact_quality_inspection AS q JOIN manufacturing.dim_production_line AS line ON line.id = q.line_id WHERE q.inspection_date >= CURRENT_DATE - INTERVAL '30 DAYS' GROUP BY line.line_name ORDER BY value DESC LIMIT 1000",
+    "columns": [
+      "category",
+      "value"
+    ],
+    "rows": [
+      [
+        "产线B",
+        4.8
+      ],
+      [
+        "产线C",
+        3.2
+      ],
+      [
+        "产线A",
+        2.1
+      ]
+    ],
+    "conclusion": "已完成各产线不良率分析，共分析 3 条产线；超过3%的产线需要重点关注。",
+    "chart": {
+      "type": "bar",
+      "title": "最近30天各产线不良率",
+      "option": {
+        "tooltip": {
+          "trigger": "axis"
+        },
+        "xAxis": {
+          "type": "category",
+          "data": [
+            "产线B",
+            "产线C",
+            "产线A"
+          ]
+        },
+        "yAxis": {
+          "type": "value"
+        },
+        "series": [
+          {
+            "type": "bar",
+            "data": [
+              4.8,
+              3.2,
+              2.1
+            ]
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "name": "意图识别",
+        "status": "completed",
+        "detail": "规则规划器识别为 defect_rate_analysis"
+      },
+      {
+        "name": "指标匹配",
+        "status": "completed",
+        "detail": "从业务指标目录匹配计算口径"
+      },
+      {
+        "name": "SQL生成",
+        "status": "completed",
+        "detail": "选择受控分析模板"
+      },
+      {
+        "name": "安全校验",
+        "status": "completed",
+        "detail": "通过只读、Schema 白名单和行数限制检查"
+      },
+      {
+        "name": "数据执行",
+        "status": "completed",
+        "detail": "查询执行器返回 3 行"
+      }
+    ],
+    "created_at": "2026-07-25T19:32:35.290867+00:00"
+  },
+  {
+    "task_id": "78eac048-c954-495d-b874-0dc5eda0727c",
+    "conversation_id": "7f022521-c3bc-49af-af0e-7708cef07214",
+    "question": "统计每条产线最近7天的产量趋势",
+    "intent": "production_trend",
+    "plan": {
+      "intent": "manufacturing_data_analysis",
+      "metric_codes": [
+        "output_qty"
+      ],
+      "tables": [
+        "manufacturing.fact_process_output"
+      ],
+      "steps": [
+        "识别意图",
+        "匹配业务指标",
+        "定位数据表",
+        "生成安全查询",
+        "展示分析结果"
+      ]
+    },
+    "sql": "SELECT output.production_date AS date, line.line_name, SUM(output.actual_qty) AS value FROM manufacturing.fact_process_output AS output JOIN manufacturing.dim_production_line AS line ON line.id = output.line_id WHERE output.production_date >= CURRENT_DATE - INTERVAL '7 DAYS' GROUP BY output.production_date, line.line_name ORDER BY output.production_date, line.line_name LIMIT 1000",
+    "columns": [
+      "date",
+      "line_name",
+      "value"
+    ],
+    "rows": [
+      [
+        "2026-07-19",
+        "产线A",
+        980
+      ],
+      [
+        "2026-07-19",
+        "产线B",
+        920
+      ],
+      [
+        "2026-07-20",
+        "产线A",
+        1020
+      ],
+      [
+        "2026-07-20",
+        "产线B",
+        960
+      ]
+    ],
+    "conclusion": "已完成最近7天产线产量统计，共返回 4 条聚合记录。",
+    "chart": {
+      "type": "line",
+      "title": "各产线最近7天产量趋势",
+      "option": {
+        "tooltip": {
+          "trigger": "axis"
+        },
+        "legend": {
+          "data": [
+            "产线A",
+            "产线B"
+          ]
+        },
+        "xAxis": {
+          "type": "category",
+          "data": [
+            "2026-07-19",
+            "2026-07-20"
+          ]
+        },
+        "yAxis": {
+          "type": "value"
+        },
+        "series": [
+          {
+            "name": "产线A",
+            "type": "line",
+            "smooth": true,
+            "data": [
+              980,
+              1020
+            ]
+          },
+          {
+            "name": "产线B",
+            "type": "line",
+            "smooth": true,
+            "data": [
+              920,
+              960
+            ]
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "name": "意图识别",
+        "status": "completed",
+        "detail": "规则规划器识别为 production_trend"
+      },
+      {
+        "name": "指标匹配",
+        "status": "completed",
+        "detail": "从业务指标目录匹配计算口径"
+      },
+      {
+        "name": "SQL生成",
+        "status": "completed",
+        "detail": "选择受控分析模板"
+      },
+      {
+        "name": "安全校验",
+        "status": "completed",
+        "detail": "通过只读、Schema 白名单和行数限制检查"
+      },
+      {
+        "name": "数据执行",
+        "status": "completed",
+        "detail": "查询执行器返回 4 行"
+      }
+    ],
+    "created_at": "2026-07-25T19:32:35.413305+00:00"
+  },
+  {
+    "task_id": "5b98ece9-59b4-4ce6-b08a-45551c3664d5",
+    "conversation_id": "b3fdf841-6027-491e-a050-cc0f241aff95",
+    "question": "分析最近30天各产线的不良率",
+    "intent": "defect_rate_analysis",
+    "plan": {
+      "intent": "manufacturing_data_analysis",
+      "metric_codes": [
+        "defect_rate"
+      ],
+      "tables": [
+        "manufacturing.fact_quality_inspection",
+        "manufacturing.dim_production_line"
+      ],
+      "steps": [
+        "识别意图",
+        "匹配业务指标",
+        "定位数据表",
+        "生成安全查询",
+        "展示分析结果"
+      ]
+    },
+    "sql": "SELECT line.line_name AS category, ROUND(SUM(q.defect_qty) * 100.0 / NULLIF(SUM(q.inspected_qty), 0), 2) AS value FROM manufacturing.fact_quality_inspection AS q JOIN manufacturing.dim_production_line AS line ON line.id = q.line_id WHERE q.inspection_date >= CURRENT_DATE - INTERVAL '30 DAYS' GROUP BY line.line_name ORDER BY value DESC LIMIT 1000",
+    "columns": [
+      "category",
+      "value"
+    ],
+    "rows": [
+      [
+        "产线B",
+        4.8
+      ],
+      [
+        "产线C",
+        3.2
+      ],
+      [
+        "产线A",
+        2.1
+      ]
+    ],
+    "conclusion": "已完成各产线不良率分析，共分析 3 条产线；超过3%的产线需要重点关注。",
+    "chart": {
+      "type": "bar",
+      "title": "最近30天各产线不良率",
+      "option": {
+        "tooltip": {
+          "trigger": "axis"
+        },
+        "xAxis": {
+          "type": "category",
+          "data": [
+            "产线B",
+            "产线C",
+            "产线A"
+          ]
+        },
+        "yAxis": {
+          "type": "value"
+        },
+        "series": [
+          {
+            "type": "bar",
+            "data": [
+              4.8,
+              3.2,
+              2.1
+            ]
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "name": "意图识别",
+        "status": "completed",
+        "detail": "规则规划器识别为 defect_rate_analysis"
+      },
+      {
+        "name": "指标匹配",
+        "status": "completed",
+        "detail": "从业务指标目录匹配计算口径"
+      },
+      {
+        "name": "SQL生成",
+        "status": "completed",
+        "detail": "选择受控分析模板"
+      },
+      {
+        "name": "安全校验",
+        "status": "completed",
+        "detail": "通过只读、Schema 白名单和行数限制检查"
+      },
+      {
+        "name": "数据执行",
+        "status": "completed",
+        "detail": "查询执行器返回 3 行"
+      }
+    ],
+    "created_at": "2026-07-25T19:35:09.697514+00:00"
+  },
+  {
+    "task_id": "0bdfd047-3ba5-4c4d-9fe6-c850d5861c92",
+    "conversation_id": "032d80e3-f3c2-413e-a498-48d9febe5f2b",
+    "question": "统计每条产线最近7天的产量趋势",
+    "intent": "production_trend",
+    "plan": {
+      "intent": "manufacturing_data_analysis",
+      "metric_codes": [
+        "output_qty"
+      ],
+      "tables": [
+        "manufacturing.fact_process_output"
+      ],
+      "steps": [
+        "识别意图",
+        "匹配业务指标",
+        "定位数据表",
+        "生成安全查询",
+        "展示分析结果"
+      ]
+    },
+    "sql": "SELECT output.production_date AS date, line.line_name, SUM(output.actual_qty) AS value FROM manufacturing.fact_process_output AS output JOIN manufacturing.dim_production_line AS line ON line.id = output.line_id WHERE output.production_date >= CURRENT_DATE - INTERVAL '7 DAYS' GROUP BY output.production_date, line.line_name ORDER BY output.production_date, line.line_name LIMIT 1000",
+    "columns": [
+      "date",
+      "line_name",
+      "value"
+    ],
+    "rows": [
+      [
+        "2026-07-19",
+        "产线A",
+        980
+      ],
+      [
+        "2026-07-19",
+        "产线B",
+        920
+      ],
+      [
+        "2026-07-20",
+        "产线A",
+        1020
+      ],
+      [
+        "2026-07-20",
+        "产线B",
+        960
+      ]
+    ],
+    "conclusion": "已完成最近7天产线产量统计，共返回 4 条聚合记录。",
+    "chart": {
+      "type": "line",
+      "title": "各产线最近7天产量趋势",
+      "option": {
+        "tooltip": {
+          "trigger": "axis"
+        },
+        "legend": {
+          "data": [
+            "产线A",
+            "产线B"
+          ]
+        },
+        "xAxis": {
+          "type": "category",
+          "data": [
+            "2026-07-19",
+            "2026-07-20"
+          ]
+        },
+        "yAxis": {
+          "type": "value"
+        },
+        "series": [
+          {
+            "name": "产线A",
+            "type": "line",
+            "smooth": true,
+            "data": [
+              980,
+              1020
+            ]
+          },
+          {
+            "name": "产线B",
+            "type": "line",
+            "smooth": true,
+            "data": [
+              920,
+              960
+            ]
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "name": "意图识别",
+        "status": "completed",
+        "detail": "规则规划器识别为 production_trend"
+      },
+      {
+        "name": "指标匹配",
+        "status": "completed",
+        "detail": "从业务指标目录匹配计算口径"
+      },
+      {
+        "name": "SQL生成",
+        "status": "completed",
+        "detail": "选择受控分析模板"
+      },
+      {
+        "name": "安全校验",
+        "status": "completed",
+        "detail": "通过只读、Schema 白名单和行数限制检查"
+      },
+      {
+        "name": "数据执行",
+        "status": "completed",
+        "detail": "查询执行器返回 4 行"
+      }
+    ],
+    "created_at": "2026-07-25T19:35:09.860741+00:00"
+  },
+  {
+    "task_id": "80be70eb-5d64-4bc8-9ae5-280664a3a352",
+    "conversation_id": "087822ae-5a8d-4264-a0c2-362b7ac33dfb",
+    "question": "分析最近30天各产线的不良率",
+    "intent": "defect_rate_analysis",
+    "plan": {
+      "intent": "manufacturing_data_analysis",
+      "metric_codes": [
+        "defect_rate"
+      ],
+      "tables": [
+        "manufacturing.fact_quality_inspection",
+        "manufacturing.dim_production_line"
+      ],
+      "steps": [
+        "识别意图",
+        "匹配业务指标",
+        "定位数据表",
+        "生成安全查询",
+        "展示分析结果"
+      ]
+    },
+    "sql": "SELECT line.line_name AS category, ROUND(SUM(q.defect_qty) * 100.0 / NULLIF(SUM(q.inspected_qty), 0), 2) AS value FROM manufacturing.fact_quality_inspection AS q JOIN manufacturing.dim_production_line AS line ON line.id = q.line_id WHERE q.inspection_date >= CURRENT_DATE - INTERVAL '30 DAYS' GROUP BY line.line_name ORDER BY value DESC LIMIT 1000",
+    "columns": [
+      "category",
+      "value"
+    ],
+    "rows": [
+      [
+        "产线B",
+        4.8
+      ],
+      [
+        "产线C",
+        3.2
+      ],
+      [
+        "产线A",
+        2.1
+      ]
+    ],
+    "conclusion": "已完成各产线不良率分析，共分析 3 条产线；超过3%的产线需要重点关注。",
+    "chart": {
+      "type": "bar",
+      "title": "最近30天各产线不良率",
+      "option": {
+        "tooltip": {
+          "trigger": "axis"
+        },
+        "xAxis": {
+          "type": "category",
+          "data": [
+            "产线B",
+            "产线C",
+            "产线A"
+          ]
+        },
+        "yAxis": {
+          "type": "value"
+        },
+        "series": [
+          {
+            "type": "bar",
+            "data": [
+              4.8,
+              3.2,
+              2.1
+            ]
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "name": "意图识别",
+        "status": "completed",
+        "detail": "规则规划器识别为 defect_rate_analysis"
+      },
+      {
+        "name": "指标匹配",
+        "status": "completed",
+        "detail": "从业务指标目录匹配计算口径"
+      },
+      {
+        "name": "SQL生成",
+        "status": "completed",
+        "detail": "选择受控分析模板"
+      },
+      {
+        "name": "安全校验",
+        "status": "completed",
+        "detail": "通过只读、Schema 白名单和行数限制检查"
+      },
+      {
+        "name": "数据执行",
+        "status": "completed",
+        "detail": "查询执行器返回 3 行"
+      }
+    ],
+    "created_at": "2026-07-26T15:29:01.743841+00:00"
+  },
+  {
+    "task_id": "8e53d839-5978-4395-9e58-5e8328bb85a5",
+    "conversation_id": "79a3afa4-364d-48e7-b24d-4ba02d869ed1",
+    "question": "统计每条产线最近7天的产量趋势",
+    "intent": "production_trend",
+    "plan": {
+      "intent": "manufacturing_data_analysis",
+      "metric_codes": [
+        "output_qty"
+      ],
+      "tables": [
+        "manufacturing.fact_process_output"
+      ],
+      "steps": [
+        "识别意图",
+        "匹配业务指标",
+        "定位数据表",
+        "生成安全查询",
+        "展示分析结果"
+      ]
+    },
+    "sql": "SELECT output.production_date AS date, line.line_name, SUM(output.actual_qty) AS value FROM manufacturing.fact_process_output AS output JOIN manufacturing.dim_production_line AS line ON line.id = output.line_id WHERE output.production_date >= CURRENT_DATE - INTERVAL '7 DAYS' GROUP BY output.production_date, line.line_name ORDER BY output.production_date, line.line_name LIMIT 1000",
+    "columns": [
+      "date",
+      "line_name",
+      "value"
+    ],
+    "rows": [
+      [
+        "2026-07-19",
+        "产线A",
+        980
+      ],
+      [
+        "2026-07-19",
+        "产线B",
+        920
+      ],
+      [
+        "2026-07-20",
+        "产线A",
+        1020
+      ],
+      [
+        "2026-07-20",
+        "产线B",
+        960
+      ]
+    ],
+    "conclusion": "已完成最近7天产线产量统计，共返回 4 条聚合记录。",
+    "chart": {
+      "type": "line",
+      "title": "各产线最近7天产量趋势",
+      "option": {
+        "tooltip": {
+          "trigger": "axis"
+        },
+        "legend": {
+          "data": [
+            "产线A",
+            "产线B"
+          ]
+        },
+        "xAxis": {
+          "type": "category",
+          "data": [
+            "2026-07-19",
+            "2026-07-20"
+          ]
+        },
+        "yAxis": {
+          "type": "value"
+        },
+        "series": [
+          {
+            "name": "产线A",
+            "type": "line",
+            "smooth": true,
+            "data": [
+              980,
+              1020
+            ]
+          },
+          {
+            "name": "产线B",
+            "type": "line",
+            "smooth": true,
+            "data": [
+              920,
+              960
+            ]
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "name": "意图识别",
+        "status": "completed",
+        "detail": "规则规划器识别为 production_trend"
+      },
+      {
+        "name": "指标匹配",
+        "status": "completed",
+        "detail": "从业务指标目录匹配计算口径"
+      },
+      {
+        "name": "SQL生成",
+        "status": "completed",
+        "detail": "选择受控分析模板"
+      },
+      {
+        "name": "安全校验",
+        "status": "completed",
+        "detail": "通过只读、Schema 白名单和行数限制检查"
+      },
+      {
+        "name": "数据执行",
+        "status": "completed",
+        "detail": "查询执行器返回 4 行"
+      }
+    ],
+    "created_at": "2026-07-26T15:29:01.829784+00:00"
+  },
+  {
+    "task_id": "37c0056d-b516-4263-8827-be7addc2baca",
+    "conversation_id": "f68366e5-cdb1-49bf-8968-8f7545f2d849",
+    "question": "分析最近30天各产线的不良率",
+    "intent": "defect_rate_analysis",
+    "plan": {
+      "intent": "manufacturing_data_analysis",
+      "metric_codes": [
+        "defect_rate"
+      ],
+      "tables": [
+        "manufacturing.fact_quality_inspection",
+        "manufacturing.dim_production_line"
+      ],
+      "steps": [
+        "识别意图",
+        "匹配业务指标",
+        "定位数据表",
+        "生成安全查询",
+        "展示分析结果"
+      ]
+    },
+    "sql": "SELECT line.line_name AS category, ROUND(SUM(q.defect_qty) * 100.0 / NULLIF(SUM(q.inspected_qty), 0), 2) AS value FROM manufacturing.fact_quality_inspection AS q JOIN manufacturing.dim_production_line AS line ON line.id = q.line_id WHERE q.inspection_date >= CURRENT_DATE - INTERVAL '30 DAYS' GROUP BY line.line_name ORDER BY value DESC LIMIT 1000",
+    "columns": [
+      "category",
+      "value"
+    ],
+    "rows": [
+      [
+        "产线B",
+        4.8
+      ],
+      [
+        "产线C",
+        3.2
+      ],
+      [
+        "产线A",
+        2.1
+      ]
+    ],
+    "conclusion": "已完成各产线不良率分析，共分析 3 条产线；超过3%的产线需要重点关注。",
+    "chart": {
+      "type": "bar",
+      "title": "最近30天各产线不良率",
+      "option": {
+        "tooltip": {
+          "trigger": "axis"
+        },
+        "xAxis": {
+          "type": "category",
+          "data": [
+            "产线B",
+            "产线C",
+            "产线A"
+          ]
+        },
+        "yAxis": {
+          "type": "value"
+        },
+        "series": [
+          {
+            "type": "bar",
+            "data": [
+              4.8,
+              3.2,
+              2.1
+            ]
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "name": "意图识别",
+        "status": "completed",
+        "detail": "规则规划器识别为 defect_rate_analysis"
+      },
+      {
+        "name": "指标匹配",
+        "status": "completed",
+        "detail": "从业务指标目录匹配计算口径"
+      },
+      {
+        "name": "SQL生成",
+        "status": "completed",
+        "detail": "选择受控分析模板"
+      },
+      {
+        "name": "安全校验",
+        "status": "completed",
+        "detail": "通过只读、Schema 白名单和行数限制检查"
+      },
+      {
+        "name": "数据执行",
+        "status": "completed",
+        "detail": "查询执行器返回 3 行"
+      }
+    ],
+    "created_at": "2026-07-26T18:09:07.082739+00:00"
+  },
+  {
+    "task_id": "e218c996-5e0f-457e-ba9d-e83b466b1d97",
+    "conversation_id": "2298bfd0-f819-488e-9318-8738f6bdd4b4",
+    "question": "统计每条产线最近7天的产量趋势",
+    "intent": "production_trend",
+    "plan": {
+      "intent": "manufacturing_data_analysis",
+      "metric_codes": [
+        "output_qty"
+      ],
+      "tables": [
+        "manufacturing.fact_process_output"
+      ],
+      "steps": [
+        "识别意图",
+        "匹配业务指标",
+        "定位数据表",
+        "生成安全查询",
+        "展示分析结果"
+      ]
+    },
+    "sql": "SELECT output.production_date AS date, line.line_name, SUM(output.actual_qty) AS value FROM manufacturing.fact_process_output AS output JOIN manufacturing.dim_production_line AS line ON line.id = output.line_id WHERE output.production_date >= CURRENT_DATE - INTERVAL '7 DAYS' GROUP BY output.production_date, line.line_name ORDER BY output.production_date, line.line_name LIMIT 1000",
+    "columns": [
+      "date",
+      "line_name",
+      "value"
+    ],
+    "rows": [
+      [
+        "2026-07-19",
+        "产线A",
+        980
+      ],
+      [
+        "2026-07-19",
+        "产线B",
+        920
+      ],
+      [
+        "2026-07-20",
+        "产线A",
+        1020
+      ],
+      [
+        "2026-07-20",
+        "产线B",
+        960
+      ]
+    ],
+    "conclusion": "已完成最近7天产线产量统计，共返回 4 条聚合记录。",
+    "chart": {
+      "type": "line",
+      "title": "各产线最近7天产量趋势",
+      "option": {
+        "tooltip": {
+          "trigger": "axis"
+        },
+        "legend": {
+          "data": [
+            "产线A",
+            "产线B"
+          ]
+        },
+        "xAxis": {
+          "type": "category",
+          "data": [
+            "2026-07-19",
+            "2026-07-20"
+          ]
+        },
+        "yAxis": {
+          "type": "value"
+        },
+        "series": [
+          {
+            "name": "产线A",
+            "type": "line",
+            "smooth": true,
+            "data": [
+              980,
+              1020
+            ]
+          },
+          {
+            "name": "产线B",
+            "type": "line",
+            "smooth": true,
+            "data": [
+              920,
+              960
+            ]
+          }
+        ]
+      }
+    },
+    "steps": [
+      {
+        "name": "意图识别",
+        "status": "completed",
+        "detail": "规则规划器识别为 production_trend"
+      },
+      {
+        "name": "指标匹配",
+        "status": "completed",
+        "detail": "从业务指标目录匹配计算口径"
+      },
+      {
+        "name": "SQL生成",
+        "status": "completed",
+        "detail": "选择受控分析模板"
+      },
+      {
+        "name": "安全校验",
+        "status": "completed",
+        "detail": "通过只读、Schema 白名单和行数限制检查"
+      },
+      {
+        "name": "数据执行",
+        "status": "completed",
+        "detail": "查询执行器返回 4 行"
+      }
+    ],
+    "created_at": "2026-07-26T18:09:07.222789+00:00"
+  }
+]

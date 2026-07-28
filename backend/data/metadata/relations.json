@@ -1,0 +1,34 @@
+[
+  {
+    "source_table": "manufacturing.fact_process_output",
+    "source_column": "line_id",
+    "target_table": "manufacturing.dim_production_line",
+    "target_column": "id",
+    "relation_type": "many_to_one",
+    "confidence": 1.0
+  },
+  {
+    "source_table": "manufacturing.fact_quality_inspection",
+    "source_column": "line_id",
+    "target_table": "manufacturing.dim_production_line",
+    "target_column": "id",
+    "relation_type": "many_to_one",
+    "confidence": 1.0
+  },
+  {
+    "source_table": "manufacturing.fact_quality_inspection",
+    "source_column": "product_id",
+    "target_table": "manufacturing.dim_product",
+    "target_column": "id",
+    "relation_type": "many_to_one",
+    "confidence": 1.0
+  },
+  {
+    "source_table": "manufacturing.fact_inventory",
+    "source_column": "product_id",
+    "target_table": "manufacturing.dim_product",
+    "target_column": "id",
+    "relation_type": "many_to_one",
+    "confidence": 1.0
+  }
+]

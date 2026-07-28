@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "rule_code": "defect_rate_warning",
+    "rule_name": "不良率预警",
+    "category": "质量",
+    "rule_type": "threshold",
+    "expression": "defect_rate > 0.03",
+    "description": "不良率超过3%时标记为质量异常。",
+    "priority": 10,
+    "status": "active",
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  },
+  {
+    "id": 2,
+    "rule_code": "inventory_shortage",
+    "rule_name": "库存不足预警",
+    "category": "库存",
+    "rule_type": "threshold",
+    "expression": "current_qty < safety_qty",
+    "description": "当前库存低于安全库存时建议补货。",
+    "priority": 20,
+    "status": "active",
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  }
+]

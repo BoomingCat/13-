@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "object_code": "factory",
+    "object_name": "工厂",
+    "category": "组织",
+    "description": "企业生产经营的最高层级组织。",
+    "source_table": null,
+    "status": "active",
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  },
+  {
+    "id": 2,
+    "object_code": "workshop",
+    "object_name": "车间",
+    "category": "组织",
+    "description": "承担具体制造任务的生产组织。",
+    "source_table": "manufacturing.dim_workshop",
+    "status": "active",
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  },
+  {
+    "id": 3,
+    "object_code": "production_line",
+    "object_name": "产线",
+    "category": "生产",
+    "description": "完成产品连续加工的生产线。",
+    "source_table": "manufacturing.dim_production_line",
+    "status": "active",
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  },
+  {
+    "id": 4,
+    "object_code": "equipment",
+    "object_name": "设备",
+    "category": "设备",
+    "description": "生产过程中使用的机器设备。",
+    "source_table": "manufacturing.dim_equipment",
+    "status": "active",
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  },
+  {
+    "id": 5,
+    "object_code": "product",
+    "object_name": "产品",
+    "category": "产品",
+    "description": "企业生产和检验的产品。",
+    "source_table": "manufacturing.dim_product",
+    "status": "active",
+    "created_at": "2026-07-26T00:00:00+08:00",
+    "updated_at": "2026-07-26T00:00:00+08:00"
+  }
+]
