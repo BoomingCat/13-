@@ -48,4 +48,12 @@ async def runtime() -> dict[str, str | bool]:
         "llm_enabled": settings.llm_enabled,
         "llm_provider": settings.llm_provider,
         "llm_model": settings.llm_model,
+        "api_host": settings.api_host,
+        "api_port": settings.api_port,
+        "web_port": settings.web_port,
+        "external_data_dir": str(settings.resolved_external_data_dir or ""),
+        "external_data_available": bool(
+            settings.resolved_external_data_dir
+            and settings.resolved_external_data_dir.is_dir()
+        ),
     }

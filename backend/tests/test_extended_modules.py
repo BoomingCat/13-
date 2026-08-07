@@ -72,7 +72,9 @@ def test_analysis_history_and_report() -> None:
     assert analysis.status_code == 200
     result = analysis.json()
     assert result["plan"]["metric_codes"] == ["defect_rate"]
-    assert result["rows"][0][0] == "产线B"
+    assert result["rows"]
+    assert result["columns"] == ["category", "value"]
+    assert all(isinstance(row[1], (int, float)) for row in result["rows"])
 
     history = client.get(f"/api/v1/history/tasks/{result['task_id']}")
     assert history.status_code == 200

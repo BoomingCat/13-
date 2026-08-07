@@ -13,13 +13,15 @@ class AnalysisTemplate:
 PRODUCTION = AnalysisTemplate(
     intent="production_trend",
     sql="""
-        SELECT output.production_date AS date, line.line_name,
-               SUM(output.actual_qty) AS value
-        FROM manufacturing.fact_process_output output
-        JOIN manufacturing.dim_production_line line ON line.id = output.line_id
-        WHERE output.production_date >= CURRENT_DATE - INTERVAL '7 days'
-        GROUP BY output.production_date, line.line_name
-        ORDER BY output.production_date, line.line_name
+        SELECT output.stat_date AS date, line.line_name,
+               SUM(output.good_qty + output.defect_qty) AS value
+        FROM manufacturing.mes_process_output output
+        JOIN manufacturing.dim_production_line line ON line.line_id = output.line_id
+        WHERE output.stat_date >= (
+            SELECT MAX(stat_date) FROM manufacturing.mes_process_output
+        ) - INTERVAL '6 days'
+        GROUP BY output.stat_date, line.line_name
+        ORDER BY output.stat_date, line.line_name
     """,
     chart_type="line",
     title="各产线最近7天产量趋势",
@@ -29,10 +31,11 @@ PRODUCTION = AnalysisTemplate(
 QUALITY = AnalysisTemplate(
     intent="quality_analysis",
     sql="""
-        SELECT process_name AS category,
-               ROUND(SUM(qualified_qty) * 100.0 / NULLIF(SUM(actual_qty), 0), 2) AS value
-        FROM manufacturing.fact_process_output
-        GROUP BY process_name ORDER BY value DESC
+        SELECT process.process_name AS category,
+               ROUND(SUM(output.good_qty) * 100.0 / NULLIF(SUM(output.input_qty), 0), 2) AS value
+        FROM manufacturing.mes_process_output output
+        JOIN manufacturing.dim_process process ON process.process_id = output.process_id
+        GROUP BY process.process_name ORDER BY value DESC
     """,
     chart_type="bar",
     title="各工序良率",
@@ -43,10 +46,15 @@ DEFECT = AnalysisTemplate(
     intent="defect_rate_analysis",
     sql="""
         SELECT line.line_name AS category,
-               ROUND(SUM(q.defect_qty) * 100.0 / NULLIF(SUM(q.inspected_qty), 0), 2) AS value
-        FROM manufacturing.fact_quality_inspection q
-        JOIN manufacturing.dim_production_line line ON line.id = q.line_id
-        WHERE q.inspection_date >= CURRENT_DATE - INTERVAL '30 days'
+               ROUND(SUM(q.defect_qty) * 100.0 / NULLIF(SUM(q.sample_qty), 0), 2) AS value
+        FROM manufacturing.qms_inspection q
+        JOIN manufacturing.mes_work_order work_order
+          ON work_order.work_order_id = q.work_order_id
+        JOIN manufacturing.dim_production_line line
+          ON line.line_id = work_order.line_id
+        WHERE q.inspection_date >= (
+            SELECT MAX(inspection_date) FROM manufacturing.qms_inspection
+        ) - INTERVAL '29 days'
         GROUP BY line.line_name
         ORDER BY value DESC
     """,
@@ -59,8 +67,10 @@ EQUIPMENT = AnalysisTemplate(
     intent="equipment_analysis",
     sql="""
         SELECT equipment_name AS category, SUM(downtime_minutes) AS value
-        FROM manufacturing.fact_equipment_downtime
-        GROUP BY equipment_name ORDER BY value DESC
+        FROM manufacturing.eqp_downtime_record downtime
+        JOIN manufacturing.dim_equipment equipment
+          ON equipment.equipment_id = downtime.equipment_id
+        GROUP BY equipment.equipment_name ORDER BY value DESC
     """,
     chart_type="bar",
     title="设备停机时长",
@@ -70,9 +80,19 @@ EQUIPMENT = AnalysisTemplate(
 INVENTORY = AnalysisTemplate(
     intent="inventory_analysis",
     sql="""
-        SELECT product_name AS category, current_qty, safety_qty,
-               GREATEST(safety_qty - current_qty, 0) AS value
-        FROM manufacturing.fact_inventory
+        SELECT product.product_name AS category,
+               SUM(inventory.available_qty) AS current_qty,
+               SUM(inventory.safety_stock_qty) AS safety_qty,
+               GREATEST(
+                   SUM(inventory.safety_stock_qty) - SUM(inventory.available_qty), 0
+               ) AS value
+        FROM manufacturing.inv_inventory_snapshot inventory
+        JOIN manufacturing.dim_product product
+          ON product.product_id = inventory.product_id
+        WHERE inventory.snapshot_date = (
+            SELECT MAX(snapshot_date) FROM manufacturing.inv_inventory_snapshot
+        )
+        GROUP BY product.product_name
         ORDER BY value DESC
     """,
     chart_type="bar",

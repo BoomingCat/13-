@@ -8,6 +8,8 @@ from app.infrastructure.database import get_db
 from app.infrastructure.sql.executor import MockQueryExecutor, ReadOnlyQueryExecutor
 from app.modules.analysis.schemas import AnalysisRequest, AnalysisResponse
 from app.modules.analysis.service import AgentService
+from app.modules.datasets.analysis_executor import CsvAnalysisExecutor
+from app.modules.datasets.repository import CsvDatasetRepository
 from app.modules.history.repository import AnalysisHistoryRepository
 from app.modules.history.service import HistoryService
 
@@ -16,10 +18,17 @@ router = APIRouter()
 
 async def get_agent_service() -> AsyncIterator[AgentService]:
     if settings.query_executor == "mock":
-        yield AgentService(MockQueryExecutor(
-            max_rows=settings.sql_max_rows,
-            allowed_schemas=set(settings.business_schemas),
-        ))
+        if settings.resolved_external_data_dir and settings.resolved_external_data_dir.is_dir():
+            yield AgentService(CsvAnalysisExecutor(
+                CsvDatasetRepository(settings.resolved_external_data_dir),
+                max_rows=settings.sql_max_rows,
+                allowed_schemas=set(settings.business_schemas),
+            ))
+        else:
+            yield AgentService(MockQueryExecutor(
+                max_rows=settings.sql_max_rows,
+                allowed_schemas=set(settings.business_schemas),
+            ))
         return
     if settings.query_executor != "database":
         raise RuntimeError(f"不支持的 QUERY_EXECUTOR: {settings.query_executor}")
