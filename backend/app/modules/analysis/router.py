@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 
 from app.core.config import settings
 from app.infrastructure.database import get_db
+from app.infrastructure.llm.factory import build_llm_client
 from app.infrastructure.sql.executor import MockQueryExecutor, ReadOnlyQueryExecutor
 from app.modules.analysis.schemas import AnalysisRequest, AnalysisResponse
 from app.modules.analysis.service import AgentService
@@ -17,27 +18,42 @@ router = APIRouter()
 
 
 async def get_agent_service() -> AsyncIterator[AgentService]:
+    llm_client = (
+        build_llm_client()
+        if settings.llm_enabled and settings.llm_enhance_conclusions
+        else None
+    )
+    service: AgentService
     if settings.query_executor == "mock":
         if settings.resolved_external_data_dir and settings.resolved_external_data_dir.is_dir():
-            yield AgentService(CsvAnalysisExecutor(
+            service = AgentService(CsvAnalysisExecutor(
                 CsvDatasetRepository(settings.resolved_external_data_dir),
                 max_rows=settings.sql_max_rows,
                 allowed_schemas=set(settings.business_schemas),
-            ))
+            ), llm_client)
         else:
-            yield AgentService(MockQueryExecutor(
+            service = AgentService(MockQueryExecutor(
                 max_rows=settings.sql_max_rows,
                 allowed_schemas=set(settings.business_schemas),
-            ))
+            ), llm_client)
+        try:
+            yield service
+        finally:
+            if llm_client is not None:
+                await llm_client.close()
         return
-    if settings.query_executor != "database":
-        raise RuntimeError(f"不支持的 QUERY_EXECUTOR: {settings.query_executor}")
-    async for session in get_db():
-        yield AgentService(ReadOnlyQueryExecutor(
-            session,
-            max_rows=settings.sql_max_rows,
-            allowed_schemas=set(settings.business_schemas),
-        ))
+    try:
+        if settings.query_executor != "database":
+            raise RuntimeError(f"不支持的 QUERY_EXECUTOR: {settings.query_executor}")
+        async for session in get_db():
+            yield AgentService(ReadOnlyQueryExecutor(
+                session,
+                max_rows=settings.sql_max_rows,
+                allowed_schemas=set(settings.business_schemas),
+            ), llm_client)
+    finally:
+        if llm_client is not None:
+            await llm_client.close()
 
 
 @router.post("/query", response_model=AnalysisResponse)

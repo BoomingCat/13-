@@ -46,6 +46,7 @@ async def runtime() -> dict[str, str | bool | int]:
         "query_executor": settings.query_executor,
         "database_schema": settings.database_schema,
         "llm_enabled": settings.llm_enabled,
+        "llm_enhance_conclusions": settings.llm_enhance_conclusions,
         "llm_provider": settings.llm_provider,
         "llm_model": settings.llm_model,
         "api_host": settings.api_host,

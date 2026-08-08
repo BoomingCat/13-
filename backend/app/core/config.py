@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     minio_endpoint: str = "localhost:9000"
 
     llm_enabled: bool = False
+    llm_enhance_conclusions: bool = False
     llm_provider: Literal["deepseek"] = "deepseek"
     llm_api_key: str = ""
     llm_base_url: str = "https://api.deepseek.com"
