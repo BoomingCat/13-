@@ -6,18 +6,45 @@ export interface AgentStep {
 
 export interface AnalysisResult {
   task_id: string;
+  conversation_id?: string;
   question: string;
   intent: string;
+  plan?: Record<string, unknown>;
   sql?: string;
   columns: string[];
-  rows: Array<Array<string | number>>;
+  rows: Array<Array<string | number | boolean | null>>;
   conclusion: string;
   chart?: { title: string; type: string; option: Record<string, unknown> };
   steps: AgentStep[];
+  source: "api" | "mock";
+  fallback_reason?: string;
 }
 
 export async function analyze(question: string): Promise<AnalysisResult> {
-  // 当前阶段完全使用浏览器本地 Mock，不调用 Agent、后端或大模型 API。
+  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+  const allowMockFallback = import.meta.env.VITE_ENABLE_MOCK_FALLBACK !== "false";
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/v1/analysis/query`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`后端返回 ${response.status}${detail ? `：${detail}` : ""}`);
+    }
+    return { ...(await response.json() as Omit<AnalysisResult, "source">), source: "api" };
+  } catch (error) {
+    if (!allowMockFallback) throw error;
+    const fallback = await mockAnalyze(question);
+    fallback.fallback_reason = error instanceof Error ? error.message : "无法连接后端";
+    return fallback;
+  }
+}
+
+async function mockAnalyze(question: string): Promise<AnalysisResult> {
   await new Promise((resolve) => window.setTimeout(resolve, 500));
   if (/良率|合格率|不良/.test(question)) return qualityResult(question);
   if (/停机|设备|故障/.test(question)) return equipmentResult(question);
@@ -34,6 +61,7 @@ export async function analyze(question: string): Promise<AnalysisResult> {
     columns: ["日期", "一号产线", "二号产线"],
     rows: dates.map((date, index) => [date, firstLine[index], secondLine[index]]),
     conclusion: "一号产线总体呈上升趋势；二号产线波动较小，最近三天持续增长。当前结果来自前端本地模拟数据。",
+    source: "mock",
     chart: {
       type: "line",
       title: "各产线最近7天产量趋势",
@@ -59,7 +87,7 @@ export async function analyze(question: string): Promise<AnalysisResult> {
 
 function base(question: string, intent: string, sql: string, conclusion: string, columns: string[], rows: Array<Array<string | number>>, chart: AnalysisResult["chart"]): AnalysisResult {
   return {
-    task_id: crypto.randomUUID(), question, intent, sql, conclusion, columns, rows, chart,
+    task_id: crypto.randomUUID(), question, intent, sql, conclusion, columns, rows, chart, source: "mock",
     steps: [
       { name: "意图识别", status: "completed", detail: `本地规则识别为 ${intent}` },
       { name: "指标匹配", status: "completed", detail: "从业务指标目录匹配指标口径" },

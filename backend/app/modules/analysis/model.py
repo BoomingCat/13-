@@ -1,8 +1,10 @@
 from datetime import datetime
+from typing import ClassVar
 from uuid import UUID, uuid4
 
 from sqlalchemy import DateTime, String, Text, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID as PGUUID
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import Base
@@ -10,7 +12,7 @@ from app.infrastructure.database.base import Base
 
 class AnalysisTask(Base):
     __tablename__ = "analysis_tasks"
-    __table_args__ = {"schema": "datamind"}
+    __table_args__: ClassVar[dict[str, str]] = {"schema": "datamind"}
 
     id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
     conversation_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), index=True)

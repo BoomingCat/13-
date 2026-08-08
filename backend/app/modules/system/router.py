@@ -40,7 +40,7 @@ async def tables() -> dict[str, list[dict]]:
 
 
 @router.get("/runtime")
-async def runtime() -> dict[str, str | bool]:
+async def runtime() -> dict[str, str | bool | int]:
     return {
         "storage_backend": settings.storage_backend,
         "query_executor": settings.query_executor,
