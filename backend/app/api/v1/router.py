@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.modules.analysis.router import router as analysis_router
 from app.modules.analytics.router import router as analytics_router
+from app.modules.datasets.router import router as datasets_router
 from app.modules.history.router import router as history_router
 from app.modules.knowledge.router import router as knowledge_router
 from app.modules.metadata.router import router as metadata_router
@@ -19,6 +20,7 @@ api_router.include_router(metadata_router, prefix="/metadata", tags=["metadata"]
 api_router.include_router(modeling_router, prefix="/modeling", tags=["modeling"])
 api_router.include_router(sql_router, prefix="/sql", tags=["sql"])
 api_router.include_router(analytics_router, prefix="/analytics", tags=["analytics"])
+api_router.include_router(datasets_router, prefix="/datasets", tags=["datasets"])
 api_router.include_router(visualization_router, prefix="/visualization", tags=["visualization"])
 api_router.include_router(history_router, prefix="/history", tags=["history"])
 api_router.include_router(reporting_router, prefix="/reports", tags=["reports"])

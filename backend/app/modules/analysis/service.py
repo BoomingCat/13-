@@ -1,8 +1,13 @@
 from collections import defaultdict
 from typing import Any
 
-from app.modules.analysis.schemas import AgentStep, AnalysisRequest, AnalysisResponse, ChartSpec
 from app.modules.analysis.planner import RuleBasedPlanner
+from app.modules.analysis.schemas import (
+    AgentStep,
+    AnalysisRequest,
+    AnalysisResponse,
+    ChartSpec,
+)
 from app.modules.analysis.templates import AnalysisTemplate, select_template
 
 
@@ -35,7 +40,11 @@ class AgentService:
                 AgentStep(name="指标匹配", status="completed", detail="从业务指标目录匹配计算口径"),
                 AgentStep(name="SQL生成", status="completed", detail="选择受控分析模板"),
                 AgentStep(name="安全校验", status="completed", detail="通过只读、Schema 白名单和行数限制检查"),
-                AgentStep(name="数据执行", status="completed", detail=f"查询执行器返回 {len(rows)} 行"),
+                AgentStep(
+                    name="数据执行",
+                    status="completed",
+                    detail=f"{getattr(self.executor, 'source_name', '查询执行器')}返回 {len(rows)} 行",
+                ),
             ],
         )
         if payload.conversation_id:

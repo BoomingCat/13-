@@ -16,10 +16,14 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_debug: bool = True
     api_prefix: str = "/api/v1"
+    api_host: str = "127.0.0.1"
+    api_port: int = 8000
+    web_port: int = 5173
 
     storage_backend: Literal["json", "database"] = "json"
     query_executor: Literal["mock", "database"] = "mock"
     data_dir: Path = Path("data")
+    external_data_dir: Path | None = None
 
     database_url: str = "postgresql+asyncpg://datamind:change-me@localhost:5432/datamind"
     database_readonly_url: str = ""
@@ -51,6 +55,14 @@ class Settings(BaseSettings):
         if self.data_dir.is_absolute():
             return self.data_dir
         return self.backend_dir / self.data_dir
+
+    @property
+    def resolved_external_data_dir(self) -> Path | None:
+        if self.external_data_dir is None:
+            return None
+        if self.external_data_dir.is_absolute():
+            return self.external_data_dir
+        return self.backend_dir / self.external_data_dir
 
     @property
     def upload_dir(self) -> Path:
